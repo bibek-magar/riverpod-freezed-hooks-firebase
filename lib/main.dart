@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:freezed_riverpod/controllers/auth_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() async {
@@ -14,11 +15,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Firebase',
+      title: 'Flutter Firebase riverpod',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, watch) {
+    final authControllerState = watch(authControllerProvider);
+    return Scaffold(
+      appBar: AppBar(
+          title: const Text("Shopping List"),
+          leading: authControllerState.state != null
+              ? IconButton(
+                  icon: const Icon(Icons.logout),
+                  onPressed: () =>
+                      context.read(authControllerProvider).signOut(),
+                )
+              : null),
     );
   }
 }

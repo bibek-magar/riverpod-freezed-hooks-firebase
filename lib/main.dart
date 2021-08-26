@@ -10,17 +10,65 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String _selectedUser = "";
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Firebase riverpod',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      home: Navigator(
+        pages: [
+          MaterialPage(child: UserView((user) {
+            setState(() => _selectedUser = user);
+          })),
+          if (_selectedUser != null)
+            MaterialPage(child: UserDetailsView(_selectedUser))
+        ],
+        onPopPage: (route, result) {
+          _selectedUser = null;
+          return route.didPop(result);
+        },
       ),
-      home: HomeScreen(),
     );
+  }
+}
+
+class UserView extends StatelessWidget {
+  final _users = ["Ram", "Shyam", "Bibek"];
+  final ValueChanged didSelectUser;
+  UserView(this.didSelectUser);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(title: Text("Users")),
+        body: ListView.builder(
+            itemCount: _users.length,
+            itemBuilder: (context, index) {
+              final user = _users[index];
+              return Card(
+                  child: ListTile(
+                title: Text(user),
+                onTap: () => didSelectUser(user),
+              ));
+            }));
+  }
+}
+
+class UserDetailsView extends StatelessWidget {
+  final String user;
+
+  UserDetailsView(this.user);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(title: Text("User Details")),
+        body: Center(child: Text("Hello, $user")));
   }
 }
 
